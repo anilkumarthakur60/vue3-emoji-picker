@@ -1,4 +1,12 @@
-dist
-.husky
-public
+# Ignore artifacts
 node_modules
+dist
+coverage
+build
+.vscode
+.idea
+
+# lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

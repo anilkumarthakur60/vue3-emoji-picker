@@ -3,16 +3,9 @@
     <div class="v3-foot-left">
       <span :class="platform" class="v3-icon">
         <span v-if="native || hasError">{{ unicodeToEmoji(emoji.r) }}</span>
-        <img
-          v-else
-          :alt="unicodeToEmoji(emoji.r)"
-          :src="emoji.src"
-          @error="hasError = true"
-        />
+        <img v-else :alt="unicodeToEmoji(emoji.r)" :src="emoji.src" @error="hasError = true" />
       </span>
-      <span class="v3-text">
-        :{{ emoji[EMOJI_NAME_KEY][1] || emoji[EMOJI_NAME_KEY][0] }}:
-      </span>
+      <span class="v3-text"> :{{ emoji[EMOJI_NAME_KEY][1] || emoji[EMOJI_NAME_KEY][0] }}: </span>
     </div>
 
     <template v-if="hasSkinTones">
@@ -37,80 +30,73 @@
 </template>
 
 <script lang="ts">
-/**
- * External dependencies
- */
-import { computed, defineComponent, inject, ref, watch } from 'vue'
+  /**
+   * External dependencies
+   */
+  import { computed, defineComponent, inject, ref, watch } from 'vue'
 
-/**
- * Internal dependencies
- */
-import {
-  EMOJI_REMOTE_SRC,
-  SKIN_TONES,
-  EMOJI_RESULT_KEY,
-  EMOJI_NAME_KEY,
-} from '../constant'
-import { Store } from '../types'
-import { unicodeToEmoji, isMac } from '../helpers'
+  /**
+   * Internal dependencies
+   */
+  import { EMOJI_REMOTE_SRC, SKIN_TONES, EMOJI_RESULT_KEY, EMOJI_NAME_KEY } from '../constant'
+  import { Store } from '../types'
+  import { unicodeToEmoji, isMac } from '../helpers'
 
-export default defineComponent({
-  name: 'Header',
-  setup() {
-    const { state, updateSkinTone } = inject('store') as Store
-    const skinTone = ref(false)
-    const hasError = ref(false)
-    const stateSkinTone = computed(() => state.skinTone)
-    const skinToneText = computed(
-      () => state.options.staticTexts.skinTone || 'Skin tone'
-    )
-    const hasSkinTones = computed(() => !state.options.disableSkinTones)
-    const platform = isMac() ? 'is-mac' : ''
+  export default defineComponent({
+    name: 'FooterComponent',
+    setup() {
+      const { state, updateSkinTone } = inject('store') as Store
+      const skinTone = ref(false)
+      const hasError = ref(false)
+      const stateSkinTone = computed(() => state.skinTone)
+      const skinToneText = computed(() => state.options.staticTexts.skinTone || 'Skin tone')
+      const hasSkinTones = computed(() => !state.options.disableSkinTones)
+      const platform = isMac() ? 'is-mac' : ''
 
-    const emoji = computed<any>(() => {
+      const emoji = computed<any>(() => {
+        return {
+          ...state.emoji,
+          src: EMOJI_REMOTE_SRC + '/' + state.emoji[EMOJI_RESULT_KEY] + '.png',
+        }
+      })
+
+      function updateSkinToneState(open = true) {
+        skinTone.value = open
+      }
+
+      function toggleSkinToneState() {
+        skinTone.value = !skinTone.value
+      }
+
+      function selectSkinTone(tone: string) {
+        updateSkinTone(tone)
+        updateSkinToneState(false)
+      }
+
+      watch(
+        () => state.emoji,
+        () => {
+          hasError.value = false
+        }
+      )
+
       return {
-        ...state.emoji,
-        src: EMOJI_REMOTE_SRC + '/' + state.emoji[EMOJI_RESULT_KEY] + '.png',
+        emoji,
+        SKIN_TONES,
+        updateSkinToneState,
+        skinTone,
+        stateSkinTone,
+        selectSkinTone,
+        toggleSkinToneState,
+        EMOJI_RESULT_KEY,
+        EMOJI_NAME_KEY,
+        skinToneText,
+        hasSkinTones,
+        native: state.options.native,
+        unicodeToEmoji,
+        platform,
+        hasError,
       }
-    })
-
-    function updateSkinToneState(open = true) {
-      skinTone.value = open
-    }
-
-    function toggleSkinToneState() {
-      skinTone.value = !skinTone.value
-    }
-
-    function selectSkinTone(tone: string) {
-      updateSkinTone(tone)
-      updateSkinToneState(false)
-    }
-
-    watch(
-      () => state.emoji,
-      () => {
-        hasError.value = false
-      }
-    )
-
-    return {
-      emoji,
-      SKIN_TONES,
-      updateSkinToneState,
-      skinTone,
-      stateSkinTone,
-      selectSkinTone,
-      toggleSkinToneState,
-      EMOJI_RESULT_KEY,
-      EMOJI_NAME_KEY,
-      skinToneText,
-      hasSkinTones,
-      native: state.options.native,
-      unicodeToEmoji,
-      platform,
-      hasError,
-    }
-  },
-})
+    },
+  })
 </script>

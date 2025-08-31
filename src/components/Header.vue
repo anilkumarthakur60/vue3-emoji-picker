@@ -24,87 +24,85 @@
 </template>
 
 <script lang="ts">
-/**
- * External dependencies
- */
-import { computed, defineComponent, inject } from 'vue'
+  /**
+   * External dependencies
+   */
+  import { computed, defineComponent, inject } from 'vue'
 
-/**
- * Internal dependencies
- */
-import { Group, Store } from '../types'
-import { snakeToCapitalizedCase } from '../helpers'
+  /**
+   * Internal dependencies
+   */
+  import { Group, Store } from '../types'
+  import { snakeToCapitalizedCase } from '../helpers'
 
-/**
- * Group/Category Images
- */
-import smileys_people from '../svgs/groups/smileys_people.svg'
-import animals_nature from '../svgs/groups/animals_nature.svg'
-import food_drink from '../svgs/groups/food_drink.svg'
-import activities from '../svgs/groups/activities.svg'
-import travel_places from '../svgs/groups/travel_places.svg'
-import objects from '../svgs/groups/objects.svg'
-import symbols from '../svgs/groups/symbols.svg'
-import flags from '../svgs/groups/flags.svg'
-import recent from '../svgs/groups/recent.svg'
+  /**
+   * Group/Category Images
+   */
+  import smileys_people from '../svgs/groups/smileys_people.svg'
+  import animals_nature from '../svgs/groups/animals_nature.svg'
+  import food_drink from '../svgs/groups/food_drink.svg'
+  import activities from '../svgs/groups/activities.svg'
+  import travel_places from '../svgs/groups/travel_places.svg'
+  import objects from '../svgs/groups/objects.svg'
+  import symbols from '../svgs/groups/symbols.svg'
+  import flags from '../svgs/groups/flags.svg'
+  import recent from '../svgs/groups/recent.svg'
 
-export default defineComponent({
-  name: 'Header',
-  setup(props) {
-    const { state, updateSearch, updateActiveGroup } = inject('store') as Store
+  export default defineComponent({
+    name: 'HeaderComponent',
+    setup(props) {
+      const { state, updateSearch, updateActiveGroup } = inject('store') as Store
 
-    const hasSearch = computed(() => !state.options.hideSearch)
-    const hasGroupIcons = computed(() => !state.options.hideGroupIcons)
-    const orderedKeys = JSON.parse(JSON.stringify(state.orderedGroupKeys))
-    const placeholder = computed(
-      () => state.options.staticTexts.placeholder || ''
-    )
+      const hasSearch = computed(() => !state.options.hideSearch)
+      const hasGroupIcons = computed(() => !state.options.hideGroupIcons)
+      const orderedKeys = JSON.parse(JSON.stringify(state.orderedGroupKeys))
+      const placeholder = computed(() => state.options.staticTexts.placeholder || '')
 
-    const searchValue = computed({
-      get: () => state.search,
-      set: (value: string) => updateSearch(value),
-    })
+      const searchValue = computed({
+        get: () => state.search,
+        set: (value: string) => updateSearch(value),
+      })
 
-    const groups: Group[] = [
-      ...state.groups,
-      ...Object.keys(state.options.additionalGroups).map((g) => ({
-        key: g,
-        title: state.options.groupNames[g]
-          ? state.options.groupNames[g]
-          : snakeToCapitalizedCase(g),
-      })),
-    ] as Group[]
+      const groups: Group[] = [
+        ...state.groups,
+        ...Object.keys(state.options.additionalGroups).map((g) => ({
+          key: g,
+          title: state.options.groupNames[g]
+            ? state.options.groupNames[g]
+            : snakeToCapitalizedCase(g),
+        })),
+      ] as Group[]
 
-    const orderedGroups: Group[] = []
+      const orderedGroups: Group[] = []
 
-    orderedKeys.forEach((key: string) => {
-      const index = groups.findIndex((group) => group.key === key)
-      if (index === -1) return
-      orderedGroups.push(groups[index])
-      groups.splice(index, 1)
-    })
+      orderedKeys.forEach((key: string) => {
+        const index = groups.findIndex((group) => group.key === key)
+        if (index === -1) return
+        orderedGroups.push(groups[index])
+        groups.splice(index, 1)
+      })
 
-    return {
-      orderedGroups,
-      orderedKeys,
-      searchValue,
-      updateActiveGroup,
-      hasSearch,
-      hasGroupIcons,
-      placeholder,
-      icons: {
-        smileys_people,
-        animals_nature,
-        food_drink,
-        activities,
-        travel_places,
-        objects,
-        symbols,
-        flags,
-        ...state.options.groupIcons,
-        recent,
-      } as Record<string, string>,
-    }
-  },
-})
+      return {
+        orderedGroups,
+        orderedKeys,
+        searchValue,
+        updateActiveGroup,
+        hasSearch,
+        hasGroupIcons,
+        placeholder,
+        icons: {
+          smileys_people,
+          animals_nature,
+          food_drink,
+          activities,
+          travel_places,
+          objects,
+          symbols,
+          flags,
+          ...state.options.groupIcons,
+          recent,
+        } as Record<string, string>,
+      }
+    },
+  })
 </script>

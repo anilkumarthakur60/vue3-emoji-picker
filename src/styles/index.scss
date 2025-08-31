@@ -1,7 +1,7 @@
-@import 'scrollbar';
-@import 'picker';
-@import 'header';
-@import 'body';
-@import 'footer';
-@import 'input';
-@import 'color-theme';
+@forward './scrollbar';
+@forward './picker';
+@forward './header';
+@forward './body';
+@forward './footer';
+@forward './input';
+@forward './color-theme';

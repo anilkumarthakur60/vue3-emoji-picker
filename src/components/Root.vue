@@ -18,203 +18,180 @@
         @input="onChangeText"
         @blur="updateCursor"
       />
-      <div
-        class="v3-input-picker-wrap"
-        :class="open ? 'v3-picker-is-open' : ''"
-      >
-        <button
-          ref="button"
-          type="button"
-          class="v3-input-picker-icon"
-          @click="open = !open"
-        >
+      <div class="v3-input-picker-wrap" :class="open ? 'v3-picker-is-open' : ''">
+        <button ref="button" type="button" class="v3-input-picker-icon" @click="open = !open">
           <img :src="face" alt="" />
         </button>
 
-        <div
-          ref="picker"
-          class="v3-emoji-picker"
-          :class="'v3-color-theme-' + colorTheme"
-        >
-          <Header />
-          <Body @select="onSelect" />
-          <Footer />
+        <div ref="picker" class="v3-emoji-picker" :class="'v3-color-theme-' + colorTheme">
+          <HeaderComponent />
+          <BodyComponent @select="onSelect" />
+          <FooterComponent />
         </div>
       </div>
     </div>
   </div>
   <div v-else class="v3-emoji-picker" :class="'v3-color-theme-' + colorTheme">
-    <Header />
-    <Body @select="onSelect" />
-    <Footer />
+    <HeaderComponent />
+    <BodyComponent @select="onSelect" />
+    <FooterComponent />
   </div>
 </template>
 
 <script lang="ts">
-/**
- * External dependencies
- */
-import {
-  defineComponent,
-  ref,
-  onMounted,
-  onBeforeUnmount,
-  inject,
-  computed,
-} from 'vue'
-import { createPopper } from '@popperjs/core'
+  /**
+   * External dependencies
+   */
+  import { defineComponent, ref, onMounted, onBeforeUnmount, inject, computed } from 'vue'
+  import { createPopper } from '@popperjs/core'
 
-/**
- * Internal dependencies
- */
-import smileys_people from '../svgs/groups/smileys_people.svg'
-import Body from './Body.vue'
-import Header from './Header.vue'
-import Footer from './Footer.vue'
-import { EmojiExt, Store } from '../types'
+  /**
+   * Internal dependencies
+   */
+  import smileys_people from '../svgs/groups/smileys_people.svg'
+  import BodyComponent from './Body.vue'
+  import HeaderComponent from './Header.vue'
+  import FooterComponent from './Footer.vue'
+  import { EmojiExt, Store } from '../types'
 
-export default defineComponent({
-  name: 'PickerRoot',
-  components: {
-    Header,
-    Body,
-    Footer,
-  },
-  props: {
-    type: {
-      type: String,
-      default: '',
+  export default defineComponent({
+    name: 'PickerRoot',
+    components: {
+      HeaderComponent,
+      BodyComponent,
+      FooterComponent,
     },
-    text: {
-      type: String,
-      default: '',
+    props: {
+      type: {
+        type: String,
+        default: '',
+      },
+      text: {
+        type: String,
+        default: '',
+      },
+      additionalGroups: {
+        type: Object,
+        default: () => ({}),
+      },
+      groupOrder: {
+        type: Array,
+        default: () => [],
+      },
+      groupIcons: {
+        type: Object,
+        default: () => ({}),
+      },
+      groupNames: {
+        type: Object,
+        default: () => ({}),
+      },
     },
-    additionalGroups: {
-      type: Object,
-      default: () => ({}),
+    emits: {
+      select: (emoji: EmojiExt) => true,
+      'update:text': (value: string) => true,
     },
-    groupOrder: {
-      type: Array,
-      default: () => [],
-    },
-    groupIcons: {
-      type: Object,
-      default: () => ({}),
-    },
-    groupNames: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-  emits: {
-    select: (emoji: EmojiExt) => true,
-    'update:text': (value: string) => true,
-  },
-  setup(props, { emit }) {
-    const elem = ref<HTMLInputElement>()
-    const button = ref<HTMLButtonElement>()
-    const picker = ref<any>()
-    const open = ref(false)
-    const input = ref(props.text)
-    const isInputType = props.type === 'input' || props.type === 'textarea'
-    let cursor = -1
-    const { state } = inject('store') as Store
-    const colorTheme = computed(() => state.options.colorTheme)
+    setup(props, { emit }) {
+      const elem = ref<HTMLInputElement>()
+      const button = ref<HTMLButtonElement>()
+      const picker = ref<any>()
+      const open = ref(false)
+      const input = ref(props.text)
+      const isInputType = props.type === 'input' || props.type === 'textarea'
+      let cursor = -1
+      const { state } = inject('store') as Store
+      const colorTheme = computed(() => state.options.colorTheme)
 
-    /**
-     * Functions
-     */
-    function onSelect(emoji: EmojiExt) {
-      if (isInputType) {
-        const mode = state.options.mode
-        if (mode === 'prepend') {
-          input.value = emoji.i + input.value
-        } else if (mode === 'insert' && cursor !== -1) {
-          input.value = `${input.value.slice(0, cursor)}${
-            emoji.i
-          }${input.value.slice(cursor)}`
-          cursor += emoji.i.length
-        } else {
-          input.value += emoji.i
+      /**
+       * Functions
+       */
+      function onSelect(emoji: EmojiExt) {
+        if (isInputType) {
+          const mode = state.options.mode
+          if (mode === 'prepend') {
+            input.value = emoji.i + input.value
+          } else if (mode === 'insert' && cursor !== -1) {
+            input.value = `${input.value.slice(0, cursor)}${emoji.i}${input.value.slice(cursor)}`
+            cursor += emoji.i.length
+          } else {
+            input.value += emoji.i
+          }
+          emit('update:text', input.value)
         }
+
+        emit('select', emoji)
+      }
+
+      function updateCursor() {
+        if (elem.value) {
+          cursor = elem.value?.selectionEnd || -1
+        }
+      }
+
+      function clickListener(event: MouseEvent) {
+        const isOutside = !(event.target as HTMLElement)?.closest('.v3-input-picker-wrap')
+        if (isOutside && open.value) {
+          open.value = false
+        }
+      }
+
+      function setupPopper() {
+        if (button.value && picker.value && isInputType) {
+          let offset = state.options.offset
+
+          if (typeof offset !== 'number') {
+            offset = 6
+          }
+
+          createPopper(button.value, picker.value, {
+            placement: 'bottom-end',
+            modifiers: [
+              {
+                name: 'offset',
+                options: {
+                  offset: [0, offset],
+                },
+              },
+            ],
+          })
+
+          document.body.addEventListener('click', clickListener)
+        }
+      }
+
+      function onChangeText(event: any) {
+        input.value = event.target.value || ''
         emit('update:text', input.value)
       }
 
-      emit('select', emoji)
-    }
+      /**
+       * Lifecycle
+       */
+      onMounted(() => {
+        setupPopper()
+      })
 
-    function updateCursor() {
-      if (elem.value) {
-        cursor = elem.value?.selectionEnd || -1
+      // cleanup
+      onBeforeUnmount(() => {
+        document.body.removeEventListener('click', clickListener)
+      })
+
+      /**
+       * Return vars
+       */
+      return {
+        face: smileys_people,
+        open,
+        onSelect,
+        input,
+        elem,
+        updateCursor,
+        button,
+        picker,
+        isInputType,
+        onChangeText,
+        colorTheme,
       }
-    }
-
-    function clickListener(event: MouseEvent) {
-      const isOutside = !(event.target as HTMLElement)?.closest(
-        '.v3-input-picker-wrap'
-      )
-      if (isOutside && open.value) {
-        open.value = false
-      }
-    }
-
-    function setupPopper() {
-      if (button.value && picker.value && isInputType) {
-        let offset = state.options.offset
-
-        if (typeof offset !== 'number') {
-          offset = 6
-        }
-
-        createPopper(button.value, picker.value, {
-          placement: 'bottom-end',
-          modifiers: [
-            {
-              name: 'offset',
-              options: {
-                offset: [0, offset],
-              },
-            },
-          ],
-        })
-
-        document.body.addEventListener('click', clickListener)
-      }
-    }
-
-    function onChangeText(event: any) {
-      input.value = event.target.value || ''
-      emit('update:text', input.value)
-    }
-
-    /**
-     * Lifecycle
-     */
-    onMounted(() => {
-      setupPopper()
-    })
-
-    // cleanup
-    onBeforeUnmount(() => {
-      document.body.removeEventListener('click', clickListener)
-    })
-
-    /**
-     * Return vars
-     */
-    return {
-      face: smileys_people,
-      open,
-      onSelect,
-      input,
-      elem,
-      updateCursor,
-      button,
-      picker,
-      isInputType,
-      onChangeText,
-      colorTheme,
-    }
-  },
-})
+    },
+  })
 </script>
