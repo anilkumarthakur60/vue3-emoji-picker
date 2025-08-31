@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  unicodeToEmoji,
-  filterEmojis,
-  snakeToCapitalizedCase,
-} from '../helpers'
+import { unicodeToEmoji, filterEmojis, snakeToCapitalizedCase } from '../helpers'
 import emojis from '../data/emojis.json'
 
 describe('helpers', () => {

@@ -11,7 +11,7 @@
     "lib": ["esnext", "dom"],
     "skipLibCheck": true,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

@@ -4,7 +4,6 @@ about: Create a report to help us improve
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
 **Describe the bug**
@@ -12,6 +11,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -27,6 +27,7 @@ If applicable, add screenshots to help explain your problem.
 If applicable, add a Codesandbox link to help explain your problem.
 
 **Necessary information (please complete the following information):**
+
 - Vue version:
 - Vite/Vue-CLI version:
 - Node version:

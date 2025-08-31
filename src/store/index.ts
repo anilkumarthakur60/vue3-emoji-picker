@@ -46,9 +46,7 @@ export default function Store(): Store {
       } as EmojiRecord
     },
     get disabled() {
-      let disabled = Array.isArray(this.options.disabledGroups)
-        ? this.options.disabledGroups
-        : []
+      let disabled = Array.isArray(this.options.disabledGroups) ? this.options.disabledGroups : []
 
       if (!this.options.displayRecent) {
         disabled = ['recent', ...disabled]
@@ -57,9 +55,7 @@ export default function Store(): Store {
       return disabled
     },
     get groups(): Group[] {
-      return _groups.filter(
-        (group) => !this.disabled.includes(group.key)
-      ) as Group[]
+      return _groups.filter((group) => !this.disabled.includes(group.key)) as Group[]
     },
     get orderedGroupKeys() {
       const keys = [

@@ -52,14 +52,8 @@ export function filterEmojis(
         let result = emoji[EMOJI_UNICODE_KEY]
 
         // check skin tone
-        if (
-          skinTone !== SKIN_TONE_NEUTRAL &&
-          Array.isArray(emoji[EMOJI_VARIATIONS_KEY])
-        ) {
-          const v_index =
-            emoji[EMOJI_VARIATIONS_KEY]?.findIndex((v) =>
-              v.includes(skinTone)
-            ) || -1
+        if (skinTone !== SKIN_TONE_NEUTRAL && Array.isArray(emoji[EMOJI_VARIATIONS_KEY])) {
+          const v_index = emoji[EMOJI_VARIATIONS_KEY]?.findIndex((v) => v.includes(skinTone)) || -1
           if (v_index !== -1 && emoji[EMOJI_VARIATIONS_KEY]) {
             // @ts-ignore
             result = emoji[EMOJI_VARIATIONS_KEY][v_index]
@@ -98,7 +92,5 @@ export function isMac() {
  * @returns string
  */
 export function snakeToCapitalizedCase(string: string) {
-  return string.replace(/^_*(.)|_+(.)/g, (s, c, d) =>
-    c ? c.toUpperCase() : ' ' + d.toUpperCase()
-  )
+  return string.replace(/^_*(.)|_+(.)/g, (s, c, d) => (c ? c.toUpperCase() : ' ' + d.toUpperCase()))
 }
